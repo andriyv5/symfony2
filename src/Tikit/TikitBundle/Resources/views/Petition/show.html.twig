@@ -1,0 +1,286 @@
+{% extends 'TikitTikitBundle::layout_atro.html.twig' %}
+
+{% block title %}
+Петиція - {{ entity.petitionTitle }}
+{% endblock %}
+    {% block stylesheets %}
+<link href="{{ asset('/css/tikit/style.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('/css/font-awesome.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('/css/simplemodal/basic.css') }}" rel="stylesheet" type="text/css" />
+{# <link href="{{ asset('/css/simplemodal/basic_ie.css') }}" rel="stylesheet" type="text/css" /> #}
+{% endblock%}
+{% block javascripts %}
+<script src="{{ asset('/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('/js/bootswatch.js') }}"></script>
+<script src="{{ asset('/js/plugins/simplemodal/jquery.simplemodal.js') }}"></script>
+<script src="{{ asset('/js/plugins/simplemodal/basic.js') }}"></script>
+<script src="{{ asset('js/tikit/comment.js') }}" type="text/javascript"></script>
+<script src="{{ asset('js/petition/index.js') }}" type="text/javascript"></script>
+    {# Include this line to get the javascript AJAX code #}
+<script type="text/javascript">
+    // Check if jQuery is loaded
+    if (typeof jQuery != 'function') {
+        document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"><\/script>');
+    }
+</script>
+<script type="text/javascript">
+    $(function()
+    {
+        $(".share a").jqSocialSharer({
+      "popUpWidth" : 600,               
+      "popUpHeight": 500,               
+      "popUpTop"   : 100,               
+      "useCurrentLocation" : true       
+    }); 
+    $("#Xshare a").jqSocialSharer();
+        //document.getElementById('password').setCustomValidity('Будь-ласка введіть пароль');
+        //document.getElementById('username').setCustomValidity('Будь-ласка введіть email');
+        $( ".share a" ).click(function() {
+            $.modal.close();
+        });
+        $( "#Xshare a" ).click(function() {
+            $.modal.close();
+        });
+        $('#source-button').click(function (e) {
+            $('#basic-modal-content').modal();
+            var sendInfo = {
+                petition_id: $('#petition_id').text(),
+                user_id: $('#user_id').text()
+            };
+            $.ajax({
+                type: "POST",
+                url: 'http://petit/app_dev.php/votepetition',
+                dataType: 'json',
+                data: {
+                petition_id: $('#petition_id').text(),
+                user_id: $('#user_id').text()
+            },
+                success: function(data) {
+                    if (data.has_error) {
+                        alert(data.error);
+                    }
+                    else {
+                        // Insert your success process
+                        //alert('Welcome ' + data.username + ' !');
+                        $('#source-button').hide();
+                        $('#signed-button').show();
+                        //window.location = data.target_path;
+                    }
+                }
+            });
+            //return false;
+	});
+        $('.form-horizontal').submit(function(e) {
+            e.preventDefault();
+
+            var $this = $(e.currentTarget),
+                    inputs = {};
+
+            // Send all form's inputs
+            $.each($this.find('input'), function(i, item) {
+                var $item = $(item);
+                inputs[$item.attr('name')] = $item.val();
+            });
+            // Load dialog on click
+            $('#basic-modal-content').modal();
+            // Send form into ajax
+            $.ajax({
+                url: $this.attr('action'),
+                type: 'POST',
+                dataType: 'json',
+                data: inputs,
+                success: function(data) {
+                    if (data.has_error) {
+                        alert(data.error);
+                    }
+                    else {
+                        $('#control').hide();
+                        if (data.ok) {
+                            alert("Для завершення реєстрації і зарахування вашого голосу перевірте ваш імейл");
+                        } else {
+                            $('#signed-button').show();
+                        }
+                        //alert('Welcome ' + data.username + ' !');
+                        //window.location = data.target_path;
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% form_theme form _self %}
+{% block email_widget %}
+<div class="col-lg-10">
+        {% set type = type|default('email') %}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} required="required" class="form-control" placeholder="" />
+</div>
+{% endblock %}
+{% block text_widget %}
+<div class="col-lg-10">
+        {% set type = type|default('text') %}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} required="required" class="form-control" placeholder="" />
+</div>
+{% endblock %}
+{% block password_widget %}
+<div class="col-lg-10">
+        {% set type = type|default('password') %}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} required="required" class="form-control" placeholder="" />
+</div>
+{% endblock %} 
+
+{# {% block email_label %}
+<label class="col-lg-2 control-label required" >Email:</label>
+{% endblock %}
+{% block text_label %}
+<label class="col-lg-2 control-label required" >Username:</label>
+{% endblock %}
+{% block password_label %}
+<label class="col-lg-2 control-label required" >Password:</label>
+{% endblock %} #}
+
+{% block body -%}
+
+{% block content %}
+
+<header class="page-title">
+    <div id="petition_id" style="display:none;">{{ entity.id }}</div>
+    {% if app.user %}<div id="user_id" style="display:none;">{{ app.user.id }}</div>{%  endif %}      
+    <h1>{{ entity.petitionTitle }}</h1>
+    <small class="block styleCoor fsize13">
+        {# <a href="" class="label label-default light"><i class="fa fa-dot-circle-o"></i>Політика</a> 
+        <span class="label label-default light"> {{ entity.score }} Голосів</span> #}
+        <span class="label label-default light">{{ entity.dateAdded|date('Y-m-d H:i:s') }}</span> 
+    </small>
+<h5>Набрано: {{ entity.score }} голосів</h5>
+</header>
+<hr class="half-margins">
+<article>
+    <p class="lead">
+            {{ entity.petitionDescription }}
+    </p>
+</article>
+<hr class="half-margins">
+<!-- <div id="sign-this-petition" class="clearfix">
+    <h3 class="clearfix" style="float: left">Якщо ви зареєстровані, але є труднощі з підписанням  
+        <a href="/how-why/frequently-asked-questions">натисніть тут щоб отримати допомогу.</a>
+    </h3><br>
+</div>  --> 
+
+{% if app.user == false %}             
+<div id="control" class="form-sign"><!-- CONTROL DIV -->
+
+    <div class="col-lg-6">
+        <div class="well">
+            <form class="bs-example form-horizontal" action="{{ path("fos_user_security_check") }}" method="post" id="form-login">
+                <fieldset>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                    <legend>Зареєстровані? Введіть e-mail, пароль і натисніть "Підписати"</legend>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label" for="username">{{ 'security.login.username'|trans({}, 'FOSUserBundle') }}</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="username" name="_username" value="" required="required" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label" for="password">{{ 'security.login.password'|trans({}, 'FOSUserBundle') }}</label>
+                        <div class="col-lg-10">
+                            <input type="password" class="form-control" id="password" name="_password" required="required" />
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" />{{ 'security.login.remember_me'|trans({}, 'FOSUserBundle') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-10 col-lg-offset-2">
+                        <input type="submit" id="_submit" class="btn btn-primary" name="_submit" value="Підписати" />
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="col-lg-6">
+        <div class="well">
+            <form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="bs-example form-horizontal">
+    {# {{ form_widget(form) }} #}
+                <fieldset>
+                    <legend>Перший раз? Заповніть форму і натисніть "Підписати"</legend>
+                    <div class="form-group">
+        {{ form_label(form.email, 'Email:*', {'label': 'Email', 'label_attr': {'class': 'col-lg-2 control-label required'}}) }}
+        {{ form_widget(form.email) }}
+                    </div>
+                    <div class="form-group">
+        {{ form_label(form.name, "Ім'я:*", {'label': "Ім'я", 'label_attr': {'class': 'col-lg-2 control-label required'}}) }}
+        {{ form_widget(form.name) }}
+                    </div>
+                    <div class="form-group">
+        {{ form_label(form.plainPassword.first, 'Пароль:*', {'label': 'Пароль', 'label_attr': {'class': 'col-lg-2 control-label required'}}) }}
+        {{ form_widget(form.plainPassword.first) }}
+                    </div>
+                    <div class="form-group">
+        {{ form_label(form.plainPassword.second, 'Пароль повторно:*', {'label': 'Пароль повторно', 'label_attr': {'class': 'col-lg-2 control-label required'}}) }}
+        {{ form_widget(form.plainPassword.second) }}
+                    </div>
+  {{ form_rest(form) }}
+                    <div class="col-lg-10 col-lg-offset-2">
+                        <input type="submit" value="Підписати" name="submit" class="btn btn-primary" id="submit">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{% else %}
+   {% if scored == false %}
+<a href="javascript:void(0)" id="source-button" class="btn btn-default">Підписати петицію</a>
+   {% else %}
+<p class="btn btn-default">Ви уже підписали. Дякуємо!</p>
+   {% endif %}  
+{% endif %}
+<p id="signed-button" class="btn btn-default" style="display:none;">Ви уже підписали</p>                    
+<!-- modal content -->
+
+<div class="share">
+    <p class="socials">
+    <a href="javascript:void(0)" class="rounded-icon social fa fa-facebook facebook" data-social='{"type":"facebook", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Facebook"><!-- facebook --></a>
+    <a href="javascript:void(0)" class="rounded-icon social fa fa-twitter twitter" data-social='{"type":"twitter", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Twitter"><!-- twitter --></a>
+    <a href="javascript:void(0)" class="rounded-icon social fa fa-google-plus plusone" data-social='{"type":"plusone", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Google Plus"><!-- google plus --></a>
+    </p>
+</div>
+<div id="basic-modal-content">
+    <!-- <h3>Поширити петицію.</h3> -->
+  <div class="share">
+    <a href="javascript:void(0)" class="facebook" data-social='{"type":"facebook", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Facebook"><img src="{{ asset('img/basic/facebook_1.png') }}"></a> 
+    <a href="javascript:void(0)" class="twitter" data-social='{"type":"twitter", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Twitter"><img src="{{ asset('img/basic/twitter_1.jpg') }}"></a>
+    <a href="javascript:void(0)" class="plusone" data-social='{"type":"plusone", "url":"{{ path('petition_show', {'url': entity.petitionUrl}) }}", "text": "{{ entity.petitionTitle }}"}' title="Поширте у Google Plus"><img src="{{ asset('img/basic/gplus_1.jpg') }}"></a>
+  </div>
+</div>
+
+                {% if app.user and admin %}
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('petition') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('petition_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
+                {% else %}
+                {% endif %}
+
+<div class="span4">
+
+</div>
+{% endblock %}
+
+{% endblock %}

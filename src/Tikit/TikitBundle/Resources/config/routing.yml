@@ -1,0 +1,37 @@
+mostpopular:
+    pattern:  /
+    defaults: { _controller: TikitTikitBundle:Petition:mostpopular }
+    
+petition_create:
+    path: /p/create
+    defaults:  { _controller: TikitTikitBundle:Petition:create }
+    
+petition:
+    path: /p/index
+    defaults:  { _controller: TikitTikitBundle:Petition:index }
+petition_show:
+    path: /p/{url}
+    defaults:  { _controller: TikitTikitBundle:Petition:show }
+petition_delete:
+    path: /p/delete/{id}
+    defaults:  { _controller: TikitTikitBundle:Petition:delete }
+petition_edit:
+    path: /p/edit/{id}
+    defaults:  { _controller: TikitTikitBundle:Petition:edit }
+petition_update:
+    path: /p/update/{id}
+    defaults:  { _controller: TikitTikitBundle:Petition:update }
+petition_new:
+    path: /p/create
+    defaults:  { _controller: TikitTikitBundle:Petition:create }
+
+petition_petitions:
+    path: /petit/{page}
+    defaults:  { _controller: TikitTikitBundle:Petition:petitions }   
+bycategory:
+    path: /category/{category}/{page}
+    defaults:  { _controller: TikitTikitBundle:Petition:bycategory, page: 1 } 
+
+_votepetition:
+    path: /votepetition
+    defaults:  { _controller: TikitTikitBundle:Petition:votepetition }

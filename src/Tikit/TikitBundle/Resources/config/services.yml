@@ -1,0 +1,12 @@
+parameters:
+#    tikit_tikit.example.class: Tikit\TikitBundle\Example
+
+services:
+    #entityManager: "@doctrine.orm.entity_manager"
+    petition.model.petitionmodel:
+        class:  Tikit\TikitBundle\Service\PetitionModel
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    petition_model:
+        class:  Tikit\TikitBundle\Service\PetitionModel
+        arguments: ["@doctrine.orm.entity_manager"]

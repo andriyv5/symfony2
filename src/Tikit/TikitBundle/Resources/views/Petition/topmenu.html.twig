@@ -1,0 +1,57 @@
+
+<!-- Top Nav -->
+<div class="navbar-collapse nav-main-collapse collapse pull-right">
+    <nav class="nav-main mega-menu">
+        <ul class="nav nav-pills nav-main scroll-menu" id="topMain">
+            <li >
+                <a href="{{ path('mostpopular') }}">
+                    Головна <i class="fa fa-angle-down"></i>
+                </a>
+            </li>
+            <li class="dropdown mega-menu-item mega-menu-two-columns">
+                <a class="dropdown-toggle" href="{{ path('petition_petitions', {'page': 1}) }}">
+                    Усі петиції <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <div class="mega-menu-content">
+                            <div class="row">
+
+                                <div class="col-md-12">
+                                    <ul class="sub-menu">
+                                        <li>
+                                            <ul class="sub-menu">
+                                                {{ render(controller('TikitTikitBundle:Petition:categoryMenu')) }}
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li {% if app.user == false %}class="dropdown"{% endif %}>
+                <a {% if app.user == false %}class="dropdown-toggle"{% endif %} href="{% if app.user %}{{ path('petition_create') }} {% endif %}">
+                    <b>Додати петицію</b> <i class="fa fa-angle-down"></i>
+                </a>
+                                {% if app.user == false %}
+                <ul class="dropdown-menu">
+                    <li><p style="text-align:center;">Для того щоб мати можливість додавати петиції - <a href="{{ path('fos_user_registration_register') }}"><strong>Зареєструйтесь</strong></a> 
+                        або <a href="{{ path("fos_user_security_login") }}"><strong>Увійдіть</strong></a></li>
+                </ul>
+                                {% endif %}
+            </li>
+                            {% if app.user %}
+            <li>
+                <a href="{{ path('fos_user_security_logout') }}">
+                    Вийти <i class="fa fa-angle-down"></i>
+                </a>
+            </li>
+                            {% endif %}
+
+        </ul>
+    </nav>
+</div>
+<!-- /Top Nav -->
